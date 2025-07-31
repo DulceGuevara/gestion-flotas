@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Registro de Conductores</title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .form-panel {
+            background-color: #e0e0e0;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 3rem auto;
+            box-shadow: 0 0 10px #ccc;
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <h:form>
+        <p:panel header="Registro de Conductores" styleClass="form-panel" style="color: #333;">
+            <p:messages id="messages" showDetail="true" closable="true"/>
+
+            <p:panelGrid columns="2" columnClasses="label,value" style="width:100%" >
+
+                <h:outputLabel for="nombre" value="Nombre Completo:"/>
+                <p:inputText id="nombre" value="#{conductorBean.nombre}" required="true"/>
+
+                <h:outputLabel for="dpi" value="DPI / Identificación:"/>
+                <p:inputText id="dpi" value="#{conductorBean.dpi}" required="true"/>
+
+                <h:outputLabel for="licencia" value="No. Licencia:"/>
+                <p:inputText id="licencia" value="#{conductorBean.licencia}" required="true"/>
+
+                <h:outputLabel for="telefono" value="Teléfono:"/>
+                <p:inputMask id="telefono" value="#{conductorBean.telefono}" mask="9999-9999"/>
+
+                <h:outputLabel for="placa" value="Placa Vehículo:"/>
+                <p:inputText id="placa" value="#{conductorBean.placa}" />
+
+                <h:outputLabel for="estado" value="Estado:"/>
+                <p:selectOneMenu id="estado" value="#{conductorBean.estado}">
+                    <f:selectItem itemLabel="Seleccione" itemValue="" />
+                    <f:selectItem itemLabel="Activo" itemValue="ACTIVO" />
+                    <f:selectItem itemLabel="Inactivo" itemValue="INACTIVO" />
+                </p:selectOneMenu>
+
+            </p:panelGrid>
+
+            <p:separator/>
+
+            <p:commandButton value="Guardar Conductor" 
+                             action="#{conductorBean.guardar}" 
+                             update="messages"
+                             icon="pi pi-save"
+                             styleClass="ui-button-secondary"/>
+
+        </p:panel>
+    </h:form>
+</h:body>
+</html>
