@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+    <title>Asignación de Conductor a Vehículo y Ruta</title>
+</h:head>
+<h:body>
+    <h:form>
+
+        <h2>Asignar Conductor</h2>
+
+        <!-- Conductor -->
+        <h:panelGrid columns="2" cellpadding="5">
+            <h:outputLabel value="Conductor:" for="conductor" />
+            <h:selectOneMenu id="conductor" value="#{asignacionConductorBean.conductorSeleccionado}">
+                <f:selectItem itemLabel="Seleccione un conductor" itemValue="#{null}" />
+                <f:selectItems value="#{asignacionConductorBean.conductores}" var="c"
+                               itemValue="#{c}" itemLabel="#{c.nombre} (#{c.codigoConductor})" />
+            </h:selectOneMenu>
+
+            <!-- Vehículo -->
+            <h:outputLabel value="Vehículo (Placa):" for="vehiculo" />
+            <h:selectOneMenu id="vehiculo" value="#{asignacionConductorBean.vehiculoSeleccionado}">
+                <f:selectItem itemLabel="Seleccione un vehículo" itemValue="#{null}" />
+                <f:selectItems value="#{asignacionConductorBean.vehiculos}" var="v"
+                               itemValue="#{v}" itemLabel="#{v.placa} - #{v.marca}" />
+            </h:selectOneMenu>
+
+            <!-- Ruta -->
+            <h:outputLabel value="Ruta:" for="ruta" />
+            <h:selectOneMenu id="ruta" value="#{asignacionConductorBean.rutaSeleccionada}">
+                <f:selectItem itemLabel="Seleccione una ruta" itemValue="#{null}" />
+                <f:selectItems value="#{asignacionConductorBean.rutas}" var="r"
+                               itemValue="#{r}" itemLabel="#{r.nombreRuta}" />
+            </h:selectOneMenu>
+        </h:panelGrid>
+
+        <!-- Botón para asignar -->
+        <h:commandButton value="Asignar" action="#{asignacionConductorBean.asignar}" />
+        
+        <!-- Mostrar mensaje de éxito o error -->
+        <h:messages globalOnly="true" layout="table" />
+
+    </h:form>
+</h:body>
+</html>

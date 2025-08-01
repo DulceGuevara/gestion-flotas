@@ -2,6 +2,10 @@
              version="2.1">
     <persistence-unit name="loginPU" transaction-type="RESOURCE_LOCAL">
         <class>com.example.model.Usuario</class>
+        <class>com.example.model.Conductor</class>
+        <class>com.example.model.AsignacionConductorVehiculo</class>
+        <class>com.example.model.Rutas</class>
+        <class>com.example.model.Vehiculo</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/logistica_rutas_db"/>
@@ -9,6 +13,10 @@
             <property name="javax.persistence.jdbc.password" value="logistica123$"/>
             <property name="javax.persistence.schema-generation.database.action" value="validate"/>
             <property name="eclipselink.logging.level" value="FINE"/>
+            <property name="hibernate.show_sql" value="true"/> <!-- Muestra las consultas SQL en la consola -->
+            <property name="hibernate.format_sql" value="true"/> <!-- Formatea el SQL para mejor legibilidad -->
+            <property name="hibernate.use_sql_comments" value="true"/> <!-- Agrega comentarios para rastrear la fuente del SQL -->
+            <property name="hibernate.type" value="trace"/> <!-- Muestra los tipos de datos de los parámetros (opcional, detallado) -->
         </properties>
     </persistence-unit>
 </persistence>

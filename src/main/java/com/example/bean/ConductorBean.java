@@ -3,6 +3,7 @@ package com.example.bean;
 import com.example.model.Conductor;
 import com.example.model.Usuario;
 import com.google.gson.Gson;
+import java.sql.Timestamp;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -21,11 +22,24 @@ public class ConductorBean {
     private String dpi;
     private String licencia;
     private String telefono;
-    private String placa;
+
     private String estado;
 
-    private double latitud = 14.6349;
-    private double longitud = -90.5069;
+    public double getLatitudInicio() {
+        return 14.6349;
+    }      // ejemplo: Guatemala
+
+    public double getLongitudInicio() {
+        return -90.5069;
+    }
+
+    public double getLatitudFin() {
+        return 14.5592;
+    }         // ejemplo: Villa Nueva
+
+    public double getLongitudFin() {
+        return -90.7356;
+    }
 
     private Conductor conductor;
 
@@ -53,11 +67,12 @@ public class ConductorBean {
             conductor.setCreadoPor("admin"); // ejemplo fijo
             conductor.setModificadoPor("admin");
             conductor.setNombre(getNombre());
-            conductor.setPlacaVehiculo(getPlaca());
+
             conductor.setTelefono(getTelefono());
             conductor.setLicencia(getLicencia());
             conductor.setDpi(getDpi());
-            conductor.setEstado(Conductor.EstadoUsuario.valueOf(estado));
+            conductor.setEstado(Conductor.Estado.valueOf(estado));
+            conductor.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
 
             em.persist(conductor);
             em.getTransaction().commit();
@@ -133,20 +148,6 @@ public class ConductorBean {
     }
 
     /**
-     * @return the placa
-     */
-    public String getPlaca() {
-        return placa;
-    }
-
-    /**
-     * @param placa the placa to set
-     */
-    public void setPlaca(String placa) {
-        this.placa = placa;
-    }
-
-    /**
      * @return the estado
      */
     public String getEstado() {
@@ -158,34 +159,6 @@ public class ConductorBean {
      */
     public void setEstado(String estado) {
         this.estado = estado;
-    }
-
-    /**
-     * @return the latitud
-     */
-    public double getLatitud() {
-        return latitud;
-    }
-
-    /**
-     * @param latitud the latitud to set
-     */
-    public void setLatitud(double latitud) {
-        this.latitud = latitud;
-    }
-
-    /**
-     * @return the longitud
-     */
-    public double getLongitud() {
-        return longitud;
-    }
-
-    /**
-     * @param longitud the longitud to set
-     */
-    public void setLongitud(double longitud) {
-        this.longitud = longitud;
     }
 
 }

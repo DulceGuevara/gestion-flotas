@@ -2,56 +2,111 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core">
-<h:head>
-    <title>Mapa de Rutas</title>
+    <h:head>
+        <title>Asignaciones - Rutas</title>
 
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <!-- Leaflet CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <!-- Leaflet JS -->
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-    <style>
-        #map {
-            height: 500px;
-            width: 100%;
-            margin-top: 20px;
-            border-radius: 10px;
-            border: 2px solid #ccc;
-        }
-    </style>
-</h:head>
+        <style>
+            #map {
+                height: 500px;
+                width: 100%;
+                margin-top: 20px;
+                border-radius: 10px;
+                border: 2px solid #ccc;
+            }
 
-<h:body>
-    <h:form>
-        <h1>Ubicación del Conductor</h1>
+            .info-box {
+                margin-bottom: 20px;
+                background-color: #f9f9f9;
+                padding: 15px;
+                border-radius: 10px;
+                border: 1px solid #ddd;
+            }
 
-        <h:panelGrid columns="2" cellpadding="5">
-            <h:outputLabel value="Latitud:" />
-            <h:outputText value="#{conductorBean.latitud}" />
+            .info-box h2 {
+                margin-top: 0;
+            }
+        </style>
+    </h:head>
+    <h:body>
+        <h:form id="formSeleccion">
+            <h:outputLabel value="Seleccione una asignación:" />
+            <h:selectOneMenu value="#{asignacionBean.idAsignacionSeleccionada}">
+                <f:selectItems value="#{asignacionBean.asignacion}" var="a"
+                               itemValue="#{a.idAsignacion}" itemLabel="#{a.nombreRuta} - #{a.nombre}" />
+            </h:selectOneMenu>
 
-            <h:outputLabel value="Longitud:" />
-            <h:outputText value="#{conductorBean.longitud}" />
-        </h:panelGrid>
+            <h:commandButton value="Ver ruta"
+                             action="#{asignacionBean.cargarAsignacion}"
+                             update="formMapa" />
 
-        <div id="map"></div>
+            <h:commandButton value="Cargar rutas"
+                             action="#{asignacionBean.findDatosAsignacionById}"
+                             update="formMapa" />
+        </h:form>
 
-        <script type="text/javascript">
-            document.addEventListener('DOMContentLoaded', function () {
-                var lat = #{conductorBean.latitud};
-                var lon = #{conductorBean.longitud};
+        <h:form id="formMapa">
+            <h1>Asignaciones - Rutas</h1>
 
-                var map = L.map('map').setView([lat, lon], 13);
+            <div class="info-box">
+                <h2>Detalles de la Asignación</h2>
+                <h:panelGrid columns="2" cellpadding="5">
+                    <h:outputLabel value="Conductor:" />
+                    <h:outputText value="#{asignacionBean.asignacion1.nombre}" />
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors'
-                }).addTo(map);
+                    <h:outputLabel value="DPI:" />
+                    <h:outputText value="#{asignacionBean.asignacion1.dpi}" />
 
-                L.marker([lat, lon]).addTo(map)
-                    .bindPopup("Ubicación actual del conductor")
-                    .openPopup();
-            });
-        </script>
-    </h:form>
-</h:body>
+                    <h:outputLabel value="Vehículo (Placa):" />
+                    <h:outputText value="#{asignacionBean.asignacion1.placa}" />
+
+                    <h:outputLabel value="Marca:" />
+                    <h:outputText value="#{asignacionBean.asignacion1.marca}" />
+
+                    <h:outputLabel value="Ruta asignada:" />
+                    <h:outputText value="#{asignacionBean.asignacion1.nombreRuta}" />
+
+                    <h:outputLabel value="Fecha de asignación:" />
+                    <h:outputText value="#{asignacionBean.asignacion1.fechaAsignacion}" />
+
+                    <h:outputLabel value="GPS IMEI:" />
+                    <h:outputText value="#{asignacionBean.asignacion1.gpsImei}" />
+                </h:panelGrid>
+            </div>
+
+            <div id="map"></div>
+
+            <script type="text/javascript">
+                document.addEventListener('DOMContentLoaded', function () {
+                    var latInicio = #{asignacionBean.latitudInicio};
+                    var lonInicio = #{asignacionBean.longitudInicio};
+                    var latFin = #{asignacionBean.latitudFin};
+                    var lonFin = #{asignacionBean.longitudFin};
+
+                    var map = L.map('map').setView([(latInicio + latFin) / 2, (lonInicio + lonFin) / 2], 12);
+
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(map);
+
+                    L.marker([latInicio, lonInicio])
+                            .addTo(map)
+                            .bindPopup("📍 Punto de inicio")
+                            .openPopup();
+
+                    L.marker([latFin, lonFin])
+                            .addTo(map)
+                            .bindPopup("🏁 Punto de llegada");
+
+                    L.polyline([[latInicio, lonInicio], [latFin, lonFin]], {color: 'blue'}).addTo(map);
+                });
+            </script>
+        </h:form>
+    </h:body>
+
 </html>

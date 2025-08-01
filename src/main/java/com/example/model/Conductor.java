@@ -5,38 +5,68 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "conductor")
+@Table(name = "conductor",
+        indexes = {}) // Comentario de la tabla
 public class Conductor implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "codigo_conductor")
+    @Column(name = "codigo_conductor", nullable = false, updatable = false, columnDefinition = "int(11) COMMENT 'Código único del conductor'")
     private Integer codigoConductor;
 
-    @Column(name = "nombre")
+    @Column(name = "nombre", length = 100, nullable = false, columnDefinition = "varchar(100) COMMENT 'Nombre completo del conductor'")
     private String nombre;
-    @Column(name = "dpi")
+
+    @Column(name = "dpi", length = 20, nullable = false, columnDefinition = "varchar(20) COMMENT 'Documento de Identificación'")
     private String dpi;
-    @Column(name = "licencia")
+
+    @Column(name = "licencia", length = 20, nullable = false, columnDefinition = "varchar(20) COMMENT 'Número de licencia de conducir'")
     private String licencia;
-    @Column(name = "telefono")
+
+    @Column(name = "telefono", length = 15, columnDefinition = "varchar(15) COMMENT 'Teléfono del conductor'")
     private String telefono;
-    @Column(name = "placa_vehiculo")
-    private String placaVehiculo;
 
+    @Column(name = "estado", columnDefinition = "enum('ACTIVO','INACTIVO') DEFAULT 'ACTIVO' COMMENT 'Estado actual del conductor'")
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado", columnDefinition = "ENUM('ACTIVO', 'INACTIVO')", nullable = false)
-    private Conductor.EstadoUsuario estado = Conductor.EstadoUsuario.ACTIVO;
-    //private String estado;
+    private Estado estado;
 
-    @Column(name = "creado_por")
+    @Column(name = "creado_por", length = 50, columnDefinition = "varchar(50) COMMENT 'Usuario que creó el registro'")
     private String creadoPor;
-    @Column(name = "fecha_creacion")
+
+    @Column(name = "fecha_creacion", nullable = false, updatable = false, columnDefinition = "timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Fecha de creación'")
     private Timestamp fechaCreacion;
-    @Column(name = "modificado_por")
+
+    @Column(name = "modificado_por", length = 50, columnDefinition = "varchar(50) COMMENT 'Usuario que modificó el registro'")
     private String modificadoPor;
-    @Column(name = "fecha_modificacion")
+
+    @Column(name = "fecha_modificacion", columnDefinition = "timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT 'Fecha de última modificación'")
     private Timestamp fechaModificacion;
+
+    // Enumeración para el campo estado
+    public enum Estado {
+        ACTIVO,
+        INACTIVO
+    }
+
+    // Constructores
+    public Conductor() {
+        // Constructor vacío requerido por JPA
+    }
+
+    public Conductor(Integer codigoConductor, String nombre, String dpi, String licencia, String telefono,
+            Estado estado, String creadoPor, Timestamp fechaCreacion, String modificadoPor,
+            Timestamp fechaModificacion) {
+        this.codigoConductor = codigoConductor;
+        this.nombre = nombre;
+        this.dpi = dpi;
+        this.licencia = licencia;
+        this.telefono = telefono;
+        this.estado = estado;
+        this.creadoPor = creadoPor;
+        this.fechaCreacion = fechaCreacion;
+        this.modificadoPor = modificadoPor;
+        this.fechaModificacion = fechaModificacion;
+    }
 
     // Getters y Setters
     public Integer getCodigoConductor() {
@@ -79,12 +109,12 @@ public class Conductor implements Serializable {
         this.telefono = telefono;
     }
 
-    public String getPlacaVehiculo() {
-        return placaVehiculo;
+    public Estado getEstado() {
+        return estado;
     }
 
-    public void setPlacaVehiculo(String placaVehiculo) {
-        this.placaVehiculo = placaVehiculo;
+    public void setEstado(Estado estado) {
+        this.estado = estado;
     }
 
     public String getCreadoPor() {
@@ -119,23 +149,20 @@ public class Conductor implements Serializable {
         this.fechaModificacion = fechaModificacion;
     }
 
-    public enum EstadoUsuario {
-        ACTIVO,
-        INACTIVO
+    // Método toString (opcional, para depuración)
+    @Override
+    public String toString() {
+        return "Conductor{"
+                + "codigoConductor=" + codigoConductor
+                + ", nombre='" + nombre + '\''
+                + ", dpi='" + dpi + '\''
+                + ", licencia='" + licencia + '\''
+                + ", telefono='" + telefono + '\''
+                + ", estado=" + estado
+                + ", creadoPor='" + creadoPor + '\''
+                + ", fechaCreacion=" + fechaCreacion
+                + ", modificadoPor='" + modificadoPor + '\''
+                + ", fechaModificacion=" + fechaModificacion
+                + '}';
     }
-
-    /**
-     * @return the estado
-     */
-    public Conductor.EstadoUsuario getEstado() {
-        return estado;
-    }
-
-    /**
-     * @param estado the estado to set
-     */
-    public void setEstado(Conductor.EstadoUsuario estado) {
-        this.estado = estado;
-    }
-
 }
