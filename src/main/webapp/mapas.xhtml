@@ -1,40 +1,83 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:f="http://java.sun.com/jsf/core">
-    <h:head>
-        <title>Asignaciones - Rutas</title>
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Asignaciones - Rutas</title>
 
-        <!-- Leaflet CSS -->
-        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-        <!-- Leaflet JS -->
-        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-        <style>
-            #map {
-                height: 500px;
-                width: 100%;
-                margin-top: 20px;
-                border-radius: 10px;
-                border: 2px solid #ccc;
-            }
+    <style>
+        /* Fondo con la imagen del tema */
+        body{
+            margin:0; min-height:100vh; 
+            background: url("#{resource['images/login.png']}") no-repeat center center fixed;
+            background-size: cover;
+            color:#fff;
+            font-family: Arial, sans-serif;
+        }
 
-            .info-box {
-                margin-bottom: 20px;
-                background-color: #f9f9f9;
-                padding: 15px;
-                border-radius: 10px;
-                border: 1px solid #ddd;
-            }
+        /* Contenedor tipo tarjeta */
+        .page-card{
+            width:min(1100px, 95vw);
+            margin:80px auto 24px;
+            background: rgba(50,50,50,.65);
+            border-radius:12px;
+            box-shadow:0 4px 18px rgba(0,0,0,.45);
+            padding:1rem 1.25rem 1.5rem;
+        }
 
-            .info-box h2 {
-                margin-top: 0;
-            }
-        </style>
-    </h:head>
-    <h:body>
-        <h:form id="formSeleccion">
+        /* Barra superior con botón Regresar */
+        .top-actions{
+            position:fixed; top:12px; right:16px; z-index:1000;
+        }
+
+        /* Box de info */
+        .info-box {
+            margin-bottom: 20px;
+            background-color: rgba(255,255,255,.9);
+            color:#222;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,.25);
+        }
+
+        /* Mapa */
+        #map {
+            height: 500px;
+            width: 100%;
+            margin-top: 12px;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,.35);
+        }
+
+        /* Ajustes simples de controles */
+        h1{ margin:.25rem 0 1rem; text-align:center; }
+        .form-inline > *{ margin-right:.5rem; }
+
+        /* Header del cuadro con botón a la derecha */
+        .info-header{
+            display:flex; align-items:center; justify-content:space-between;
+            gap:1rem; margin-bottom:.5rem;
+        }
+        .info-actions .ui-button{ white-space:nowrap; }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="top-actions">
+        <p:button value="Regresar" icon="pi pi-arrow-left" outcome="dashboard.xhtml"
+                  style="background:rgba(80,80,80,.9); border:none; color:#fff; font-weight:bold; border-radius:10px; padding:.55rem 1rem;" />
+    </div>
+
+    <div class="page-card">
+
+        <h:form id="formSeleccion" styleClass="form-inline">
             <h:outputLabel value="Seleccione una asignación:" />
             <h:selectOneMenu value="#{asignacionBean.idAsignacionSeleccionada}">
                 <f:selectItems value="#{asignacionBean.asignacion}" var="a"
@@ -48,36 +91,52 @@
             <h:commandButton value="Cargar rutas"
                              action="#{asignacionBean.findDatosAsignacionById}"
                              update="formMapa" />
+            <!-- (BOTÓN MOVIDO AL CUADRO DE DETALLES) -->
         </h:form>
 
         <h:form id="formMapa">
+            <p:messages id="msgs" showDetail="true" closable="true" />
+
             <h1>Asignaciones - Rutas</h1>
 
-            <div class="info-box">
-                <h2>Detalles de la Asignación</h2>
-                <h:panelGrid columns="2" cellpadding="5">
-                    <h:outputLabel value="Conductor:" />
-                    <h:outputText value="#{asignacionBean.asignacion1.nombre}" />
+            <!-- INFO BOX con botón Finalizar a la derecha del título -->
+            <h:panelGroup id="infoBox">
+                <div class="info-box">
+                    <div class="info-header">
+                        <h2 style="margin:0">Detalles de la Asignación</h2>
+                        <div class="info-actions">
+                            <p:commandButton value="Finalizar viaje" icon="pi pi-flag"
+                                             styleClass="ui-button-danger"
+                                             type="button"
+                                             disabled="#{empty asignacionBean.idAsignacionSeleccionada}"
+                                             onclick="PF('dlgFinalizar').show()" />
+                        </div>
+                    </div>
 
-                    <h:outputLabel value="DPI:" />
-                    <h:outputText value="#{asignacionBean.asignacion1.dpi}" />
+                    <h:panelGrid columns="2" cellpadding="5">
+                        <h:outputLabel value="Conductor:" />
+                        <h:outputText value="#{asignacionBean.asignacion1.nombre}" />
 
-                    <h:outputLabel value="Vehículo (Placa):" />
-                    <h:outputText value="#{asignacionBean.asignacion1.placa}" />
+                        <h:outputLabel value="DPI:" />
+                        <h:outputText value="#{asignacionBean.asignacion1.dpi}" />
 
-                    <h:outputLabel value="Marca:" />
-                    <h:outputText value="#{asignacionBean.asignacion1.marca}" />
+                        <h:outputLabel value="Vehículo (Placa):" />
+                        <h:outputText value="#{asignacionBean.asignacion1.placa}" />
 
-                    <h:outputLabel value="Ruta asignada:" />
-                    <h:outputText value="#{asignacionBean.asignacion1.nombreRuta}" />
+                        <h:outputLabel value="Marca:" />
+                        <h:outputText value="#{asignacionBean.asignacion1.marca}" />
 
-                    <h:outputLabel value="Fecha de asignación:" />
-                    <h:outputText value="#{asignacionBean.asignacion1.fechaAsignacion}" />
+                        <h:outputLabel value="Ruta asignada:" />
+                        <h:outputText value="#{asignacionBean.asignacion1.nombreRuta}" />
 
-                    <h:outputLabel value="GPS IMEI:" />
-                    <h:outputText value="#{asignacionBean.asignacion1.gpsImei}" />
-                </h:panelGrid>
-            </div>
+                        <h:outputLabel value="Fecha de asignación:" />
+                        <h:outputText value="#{asignacionBean.asignacion1.fechaAsignacion}" />
+
+                        <h:outputLabel value="GPS IMEI:" />
+                        <h:outputText value="#{asignacionBean.asignacion1.gpsImei}" />
+                    </h:panelGrid>
+                </div>
+            </h:panelGroup>
 
             <div id="map"></div>
 
@@ -94,19 +153,25 @@
                         attribution: '© OpenStreetMap contributors'
                     }).addTo(map);
 
-                    L.marker([latInicio, lonInicio])
-                            .addTo(map)
-                            .bindPopup("📍 Punto de inicio")
-                            .openPopup();
-
-                    L.marker([latFin, lonFin])
-                            .addTo(map)
-                            .bindPopup("🏁 Punto de llegada");
-
+                    L.marker([latInicio, lonInicio]).addTo(map).bindPopup("📍 Punto de inicio").openPopup();
+                    L.marker([latFin, lonFin]).addTo(map).bindPopup("🏁 Punto de llegada");
                     L.polyline([[latInicio, lonInicio], [latFin, lonFin]], {color: 'blue'}).addTo(map);
                 });
             </script>
-        </h:form>
-    </h:body>
 
+            <!-- Confirmación -->
+            <p:confirmDialog header="Confirmación" widgetVar="dlgFinalizar" severity="warn" closable="false"
+                             message="¿Finalizar el viaje seleccionado? Se guardará fecha y hora actuales.">
+                <p:commandButton value="Sí, finalizar" icon="pi pi-check"
+                                 action="#{asignacionBean.finalizarViaje}"
+                                 update="msgs infoBox"
+                                 oncomplete="PF('dlgFinalizar').hide()" />
+                <p:commandButton value="Cancelar" icon="pi pi-times" type="button"
+                                 styleClass="ui-button-secondary"
+                                 onclick="PF('dlgFinalizar').hide()" />
+            </p:confirmDialog>
+
+        </h:form>
+    </div>
+</h:body>
 </html>

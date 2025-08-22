@@ -4,15 +4,67 @@
       xmlns:p="http://primefaces.org/ui">
 <h:head>
     <title>Login</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-panel { width: 320px; }
+
+ .login-card {
+        background: rgba(50, 50, 50, 0.6); /* gris semitransparente */
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        color: #fff; /* letras blancas para contraste */
+    }
+
+    .login-card .ui-panel-titlebar {
+        background: rgba(0,0,0,0.7); /* header más oscuro */
+        border: none;
+        color: #fff;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .login-card .ui-panel-content {
+        background: transparent; /* deja ver el gris del contenedor */
+    }
+
+    .login-card .ui-inputfield {
+        width: 100%;
+    }
+
+    .login-card .ui-button {
+        width: 100%;
+        font-weight: bold;
+    }
+
+.login-card .ui-inputfield,
+.login-card .ui-password,
+.login-card .ui-button {
+    width: 100% !important;   /* todos del mismo ancho */
+    box-sizing: border-box;   /* que no se descuadre con padding/border */
+    margin-bottom: 0.8rem;    /* separación uniforme */
+}
+
+    </style>
 </h:head>
-<h:body>
+
+<h:body style="
+    background: url('#{resource['images/login.png']}') no-repeat center center fixed;
+    background-size: cover;">
+
     <h:form>
-        <p:panel header="Iniciar sesión" style="width:300px; margin:auto;">
-            <p:messages/>
-            <p:inputText value="#{loginBean.login}" placeholder="Usuario" required="true" label="Usuario"/>
-            <p:password value="#{loginBean.password}" placeholder="Contraseña" required="true" label="Contraseña"/>
-            <p:commandButton value="Entrar" action="#{loginBean.autenticar}" ajax="false"/>
-        </p:panel>
+        <p:panel header="Iniciar sesión" styleClass="login-card">
+    <p:messages/>
+    <p:inputText value="#{loginBean.login}" placeholder="Usuario" required="true" label="Usuario"/>
+    <p:password value="#{loginBean.password}" placeholder="Contraseña" required="true" label="Contraseña"/>
+    <p:commandButton value="Entrar" action="#{loginBean.autenticar}" ajax="false"/>
+</p:panel>
+
     </h:form>
 </h:body>
 </html>

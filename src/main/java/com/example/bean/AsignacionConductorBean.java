@@ -37,6 +37,10 @@ public class AsignacionConductorBean implements Serializable {
 
     private EntityManagerFactory emf;
 
+    private Integer conductorSeleccionadoId;
+    private Integer vehiculoSeleccionadoId;
+    private Integer rutaSeleccionadaId;
+
     @PostConstruct
     public void init() {
         emf = Persistence.createEntityManagerFactory("loginPU");
@@ -46,24 +50,32 @@ public class AsignacionConductorBean implements Serializable {
     }
 
     public void asignar() {
-        AsignacionConductorVehiculo asignacion = new AsignacionConductorVehiculo();
-        asignacion.setConductor(conductorSeleccionado);
-        asignacion.setVehiculo(vehiculoSeleccionado);
-        asignacion.setRuta(rutaSeleccionada);
-        asignacion.setFechaAsignacion(new Timestamp(System.currentTimeMillis()));
-
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
+
+            Conductor conductor = em.find(Conductor.class, conductorSeleccionadoId);
+            Vehiculo vehiculo = em.find(Vehiculo.class, vehiculoSeleccionadoId);
+            Rutas ruta = (rutaSeleccionadaId != null) ? em.find(Rutas.class, rutaSeleccionadaId) : null;
+
+            AsignacionConductorVehiculo asignacion = new AsignacionConductorVehiculo();
+            asignacion.setConductor(conductor);
+            asignacion.setVehiculo(vehiculo);
+            asignacion.setRuta(ruta);
+            asignacion.setFechaAsignacion(new Timestamp(System.currentTimeMillis()));
+
             em.persist(asignacion);
             em.getTransaction().commit();
+
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Asignación guardada correctamente"));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Asignación guardada correctamente", null));
         } catch (Exception e) {
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al guardar: " + e.getMessage(), null));
-            System.out.println("Error" + e);
+            e.printStackTrace();
         } finally {
             em.close();
         }
@@ -142,6 +154,30 @@ public class AsignacionConductorBean implements Serializable {
 
     public void setRutas(List<Rutas> rutas) {
         this.rutas = rutas;
+    }
+
+    public Integer getConductorSeleccionadoId() {
+        return conductorSeleccionadoId;
+    }
+
+    public void setConductorSeleccionadoId(Integer conductorSeleccionadoId) {
+        this.conductorSeleccionadoId = conductorSeleccionadoId;
+    }
+
+    public Integer getVehiculoSeleccionadoId() {
+        return vehiculoSeleccionadoId;
+    }
+
+    public void setVehiculoSeleccionadoId(Integer vehiculoSeleccionadoId) {
+        this.vehiculoSeleccionadoId = vehiculoSeleccionadoId;
+    }
+
+    public Integer getRutaSeleccionadaId() {
+        return rutaSeleccionadaId;
+    }
+
+    public void setRutaSeleccionadaId(Integer rutaSeleccionadaId) {
+        this.rutaSeleccionadaId = rutaSeleccionadaId;
     }
 
 }

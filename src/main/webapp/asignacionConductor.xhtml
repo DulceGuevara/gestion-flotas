@@ -1,47 +1,146 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 <h:head>
     <title>Asignación de Conductor a Vehículo y Ruta</title>
+    <style>
+        body{
+            margin:0; height:100vh; display:flex; justify-content:center; align-items:center; color:#fff;
+            background: url("#{resource['images/login.png']}") no-repeat center center fixed; background-size: cover;
+        }
+        .form-card{
+            background:rgba(50,50,50,.6);
+            border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,.4);
+            color:#fff; width:min(95vw, 720px); padding:0;
+        }
+        .form-card .ui-panel-titlebar{
+            background:rgba(0,0,0,.7); border:none; color:#fff; font-weight:bold; text-align:center;
+        }
+        .form-card .ui-panel-content{ background:transparent; overflow:visible; }
+
+        /* === PanelGrid en modo TABLA (alineación perfecta Etiqueta | Control) === */
+        .form-grid{ width:100%; border-collapse:collapse; table-layout:fixed; }
+        .col-label{
+            width: 220px; text-align:right; padding:.6rem 1rem; font-weight:600;
+            color:#000; white-space:nowrap; vertical-align:middle; background:transparent !important;
+        }
+        .col-field{
+            width:auto; padding:.6rem .9rem; vertical-align:middle; background:transparent !important;
+        }
+
+        /* Controles a 100% del ancho de su celda */
+        .form-card .ui-inputfield,
+        .form-card .ui-selectonemenu,
+        .form-card .ui-selectonemenu-label,
+        .form-card .ui-button{
+            width:100% !important; box-sizing:border-box; border-radius:8px !important;
+        }
+        .form-card .ui-inputfield,
+        .form-card .ui-selectonemenu,
+        .form-card .ui-selectonemenu-label{
+            background:rgba(200,200,200,.2) !important; color:#000 !important;
+            border:1px solid rgba(255,255,255,.3) !important;
+        }
+        .form-card .ui-selectonemenu{ position:relative; padding-right:2.25rem; overflow:hidden; }
+        .form-card .ui-selectonemenu-trigger{
+            position:absolute; top:0; right:0; height:100%; width:2.25rem !important;
+            border-left:1px solid rgba(255,255,255,.2);
+        }
+        .ui-selectonemenu-panel{ min-width:100% !important; width:100% !important; max-width:95vw; }
+        .ui-selectonemenu-items-wrapper{ max-height:40vh; white-space:normal !important; word-break:break-word; }
+
+        /* Responsive: 1 columna en móviles */
+        @media (max-width: 680px){
+            .col-label, .col-field{ display:block; width:100% !important; text-align:left; padding:.4rem .9rem; }
+        }
+
+        /* Mensajes y foco */
+        #messages{ margin:.5rem .75rem; }
+        .form-card .ui-selectonemenu.ui-state-focus,
+        .form-card .ui-inputfield.ui-state-focus{
+            box-shadow:0 0 0 2px rgba(255,255,255,.25) inset !important; outline:none !important;
+        }
+    </style>
 </h:head>
+
 <h:body>
     <h:form>
+        <p:panel header="Asignar Conductor a Vehículo y Ruta" styleClass="form-card">
+            <f:facet name="actions">
+                <p:button value="Regresar" icon="pi pi-arrow-left" outcome="dashboard.xhtml"
+                          style="background:rgba(80,80,80,.9); border:none; color:#fff; font-weight:bold;"/>
+            </f:facet>
 
-        <h2>Asignar Conductor</h2>
+            <p:messages id="messages" showDetail="true" closable="true"/>
 
-        <!-- Conductor -->
-        <h:panelGrid columns="2" cellpadding="5">
-            <h:outputLabel value="Conductor:" for="conductor" />
-            <h:selectOneMenu id="conductor" value="#{asignacionConductorBean.conductorSeleccionado}">
-                <f:selectItem itemLabel="Seleccione un conductor" itemValue="#{null}" />
+            <!-- SIN layout="grid": tabular por defecto -->
+            <p:panelGrid styleClass="form-grid">
+    <p:row>
+        <p:column styleClass="col-label">
+            <h:outputLabel for="conductor" value="Conductor:"/>
+        </p:column>
+        <p:column styleClass="col-field">
+            <p:selectOneMenu id="conductor"
+                             value="#{asignacionConductorBean.conductorSeleccionadoId}"
+                             required="true" requiredMessage="Seleccione un conductor"
+                             appendTo="@(body)">
+                <f:selectItem itemLabel="Seleccione un conductor" itemValue="#{null}" noSelectionOption="true"/>
                 <f:selectItems value="#{asignacionConductorBean.conductores}" var="c"
-                               itemValue="#{c}" itemLabel="#{c.nombre} (#{c.codigoConductor})" />
-            </h:selectOneMenu>
+                               itemValue="#{c.codigoConductor}" itemLabel="#{c.nombre} (#{c.codigoConductor})"/>
+            </p:selectOneMenu>
+        </p:column>
+    </p:row>
 
-            <!-- Vehículo -->
-            <h:outputLabel value="Vehículo (Placa):" for="vehiculo" />
-            <h:selectOneMenu id="vehiculo" value="#{asignacionConductorBean.vehiculoSeleccionado}">
-                <f:selectItem itemLabel="Seleccione un vehículo" itemValue="#{null}" />
+    <p:row>
+        <p:column styleClass="col-label">
+            <h:outputLabel for="vehiculo" value="Vehículo (Placa):"/>
+        </p:column>
+        <p:column styleClass="col-field">
+            <p:selectOneMenu id="vehiculo"
+                             value="#{asignacionConductorBean.vehiculoSeleccionadoId}"
+                             required="true" requiredMessage="Seleccione un vehículo"
+                             appendTo="@(body)">
+                <f:selectItem itemLabel="Seleccione un vehículo" itemValue="#{null}" noSelectionOption="true"/>
                 <f:selectItems value="#{asignacionConductorBean.vehiculos}" var="v"
-                               itemValue="#{v}" itemLabel="#{v.placa} - #{v.marca}" />
-            </h:selectOneMenu>
+                               itemValue="#{v.idVehiculo}" itemLabel="#{v.placa} (#{v.marca} #{v.modelo})"/>
+            </p:selectOneMenu>
+        </p:column>
+    </p:row>
 
-            <!-- Ruta -->
-            <h:outputLabel value="Ruta:" for="ruta" />
-            <h:selectOneMenu id="ruta" value="#{asignacionConductorBean.rutaSeleccionada}">
-                <f:selectItem itemLabel="Seleccione una ruta" itemValue="#{null}" />
+    <p:row>
+        <p:column styleClass="col-label">
+            <h:outputLabel for="ruta" value="Ruta:"/>
+        </p:column>
+        <p:column styleClass="col-field">
+            <p:selectOneMenu id="ruta"
+                             value="#{asignacionConductorBean.rutaSeleccionadaId}"
+                             appendTo="@(body)">
+                <f:selectItem itemLabel="Sin ruta" itemValue="#{null}" noSelectionOption="true"/>
                 <f:selectItems value="#{asignacionConductorBean.rutas}" var="r"
-                               itemValue="#{r}" itemLabel="#{r.nombreRuta}" />
-            </h:selectOneMenu>
-        </h:panelGrid>
+                               itemValue="#{r.idRuta}" itemLabel="#{r.nombreRuta}"/>
+            </p:selectOneMenu>
+        </p:column>
+    </p:row>
+</p:panelGrid>
 
-        <!-- Botón para asignar -->
-        <h:commandButton value="Asignar" action="#{asignacionConductorBean.asignar}" />
-        
-        <!-- Mostrar mensaje de éxito o error -->
-        <h:messages globalOnly="true" layout="table" />
 
+            <p:separator />
+
+            <p:commandButton value="Asignar"
+                             action="#{asignacionConductorBean.asignar}"
+                             update="messages"
+                             icon="pi pi-check"
+                             styleClass="ui-button-secondary"/>
+        </p:panel>
     </h:form>
+
+    <h:outputScript>
+        // Evitar foco inicial que a veces abre overlays
+        window.addEventListener('load', function(){
+            if(document.activeElement) document.activeElement.blur();
+        });
+    </h:outputScript>
 </h:body>
 </html>

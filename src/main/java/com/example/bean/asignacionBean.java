@@ -1,6 +1,7 @@
 package com.example.bean;
 
 import com.example.bean.dto.AsignacionDTO;
+import com.example.model.AsignacionConductorVehiculo;
 import com.example.model.Conductor;
 import com.example.model.Usuario;
 import com.google.gson.Gson;
@@ -121,6 +122,57 @@ public class AsignacionBean {
             if (em != null && em.isOpen()) {
                 em.close();
             }
+        }
+    }
+
+    // ---- NUEVO: finalizar viaje ----
+    public void finalizarViaje() {
+        if (idAsignacionSeleccionada == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Seleccione una asignación primero", null));
+            return;
+        }
+
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            AsignacionConductorVehiculo a
+                    = em.find(AsignacionConductorVehiculo.class, idAsignacionSeleccionada);
+
+            if (a == null) {
+                em.getTransaction().rollback();
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_WARN, "No se encontró la asignación.", null));
+                return;
+            }
+
+            if (a.getFechaFinalizacion() != null) {
+                em.getTransaction().rollback();
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "El viaje ya estaba finalizado.", null));
+                return;
+            }
+
+            a.setFechaFinalizacion(new Timestamp(System.currentTimeMillis()));
+            em.merge(a);
+            em.getTransaction().commit();
+
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Viaje finalizado", "Se registró la fecha y hora de finalización."));
+
+            // refresca los detalles mostrados y (si quieres) la lista/mapa
+            findDatosAsignacionById();
+
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al finalizar: " + e.getMessage(), null));
+            e.printStackTrace();
+        } finally {
+            em.close();
         }
     }
 

@@ -1,27 +1,62 @@
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-         version="3.1"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Login</title>
+    <style>
+        /* resto de estilos */
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    <display-name>JSF Login App</display-name>
+    .login-card {
+        background: rgba(50, 50, 50, 0.6); /* gris semitransparente */
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        color: #fff; /* letras blancas para contraste */
+    }
 
-    <welcome-file-list>
-        <welcome-file>login.xhtml</welcome-file>
-    </welcome-file-list>
+    .login-card .ui-panel-titlebar {
+        background: rgba(0,0,0,0.7); /* header más oscuro */
+        border: none;
+        color: #fff;
+        font-weight: bold;
+        text-align: center;
+    }
 
-    <context-param>
-        <param-name>javax.faces.PROJECT_STAGE</param-name>
-        <param-value>Development</param-value>
-    </context-param>
+    .login-card .ui-panel-content {
+        background: transparent; /* deja ver el gris del contenedor */
+    }
 
-    <servlet>
-        <servlet-name>Faces Servlet</servlet-name>
-        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
+   .login-card .ui-inputfield,
+.login-card .ui-password,
+.login-card .ui-button {
+    width: 100% !important;   /* todos del mismo ancho */
+    box-sizing: border-box;   /* que no se descuadre con padding/border */
+    margin-bottom: 0.8rem;    /* separación uniforme */
+}
 
-    <servlet-mapping>
-        <servlet-name>Faces Servlet</servlet-name>
-        <url-pattern>*.xhtml</url-pattern>
-    </servlet-mapping>
-</web-app>
+    </style>
+
+	
+</h:head>
+
+<h:body style="
+    background: url('#{resource['images/login.png']}') no-repeat center center fixed;
+    background-size: cover;">
+    <h:form>
+<p:panel header="Iniciar sesión" styleClass="login-card">
+    <p:messages/>
+    <p:inputText value="#{loginBean.login}" placeholder="Usuario" required="true" label="Usuario"/>
+    <p:password value="#{loginBean.password}" placeholder="Contraseña" required="true" label="Contraseña"/>
+    <p:commandButton value="Entrar" action="#{loginBean.autenticar}" ajax="false"/>
+</p:panel>
+
+    </h:form>
+</h:body>
+</html>

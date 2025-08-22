@@ -3,62 +3,173 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
-    <h:head>
-        <title>Registro de Conductores</title>
-        <style>
-            body {
-                background-color: #f4f4f4;
-                font-family: Arial, sans-serif;
+<h:head>
+    <title>Registro de Conductores</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .form-card {
+            background: rgba(50, 50, 50, 0.6);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            color: #fff;
+            width: 100%;
+            max-width: 640px;
+        }
+
+        .form-card .ui-panel-titlebar {
+            background: rgba(0,0,0,0.7);
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            text-align: center;
+            position: relative;
+        }
+
+        .form-card .ui-panel-content {
+            background: transparent;
+        }
+
+        /* Mismo ancho para inputs y botón */
+        .form-card .ui-inputfield,
+        .form-card .ui-selectonemenu,
+        .form-card .ui-button {
+            width: 100% !important;
+            box-sizing: border-box;
+            margin-bottom: 0.8rem;
+        }
+
+        .form-card .label {
+            color: #000;
+            font-weight: 600;
+            padding-right: .5rem;
+            vertical-align: middle;
+        }
+
+        .two-cols {
+            width: 100%;
+        }
+        @media (max-width: 640px) {
+            .two-cols .ui-panelgrid-cell {
+                display: block;
+                width: 100% !important;
             }
-            .form-panel {
-                background-color: #e0e0e0;
-                padding: 2rem;
-                border-radius: 10px;
-                max-width: 600px;
-                margin: 3rem auto;
-                box-shadow: 0 0 10px #ccc;
-            }
-        </style>
-    </h:head>
+        }
 
-    <h:body>
-        <h:form>
-            <p:panel header="Registro de Conductores" styleClass="form-panel" style="color: #333;">
-                <p:messages id="messages" showDetail="true" closable="true"/>
+        #messages {
+            margin-bottom: 0.8rem;
+        }
 
-                <p:panelGrid columns="2" columnClasses="label,value" style="width:100%" >
+        .form-card .ui-panelgrid,
+        .form-card .ui-panelgrid-cell {
+            background: rgba(200,200,200,0.15) !important;
+            border: none !important;
+            border-radius: 8px;
+            padding: .5rem;
+        }
 
-                    <h:outputLabel for="nombre" value="Nombre Completo:"/>
-                    <p:inputText id="nombre" value="#{conductorBean.nombre}" required="true"/>
+        .form-card .ui-inputfield,
+        .form-card .ui-selectonemenu,
+        .form-card .ui-selectonemenu-label {
+            background: rgba(200,200,200,0.2) !important;
+            color: #fff !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+            border-radius: 8px !important;
+            padding: 0.5rem;
+        }
 
-                    <h:outputLabel for="dpi" value="DPI / Identificación:"/>
-                    <p:inputText id="dpi" value="#{conductorBean.dpi}" required="true"/>
+        .form-card .ui-inputfield::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
 
-                    <h:outputLabel for="licencia" value="No. Licencia:"/>
-                    <p:inputText id="licencia" value="#{conductorBean.licencia}" required="true"/>
+/* Botón Regresar en gris oscuro */
+.form-card .ui-panel-titlebar .ui-button {
+    background: rgba(80,80,80,0.9) !important; /* gris oscuro */
+    border: none !important;
+    color: #fff !important; /* texto blanco */
+    font-weight: bold;
+    border-radius: 6px;
+    padding: .4rem 1rem;
+}
 
-                    <h:outputLabel for="telefono" value="Teléfono:"/>
-                    <p:inputMask id="telefono" value="#{conductorBean.telefono}" mask="9999-9999"/>
+/* Inputs y select con texto negro */
+.form-card .ui-inputfield,
+.form-card .ui-selectonemenu,
+.form-card .ui-selectonemenu-label {
+    background: rgba(200,200,200,0.2) !important;
+    color: #000 !important;  /* texto negro */
+    border: 1px solid rgba(255,255,255,0.3) !important;
+    border-radius: 8px !important;
+    padding: 0.5rem;
+}
+
+/* Placeholder también gris oscuro */
+.form-card .ui-inputfield::placeholder {
+    color: rgba(0,0,0,0.6);
+}
 
 
-                    <h:outputLabel for="estado" value="Estado:"/>
-                    <p:selectOneMenu id="estado" value="#{conductorBean.estado}">
-                        <f:selectItem itemLabel="Seleccione" itemValue="" />
-                        <f:selectItem itemLabel="Activo" itemValue="ACTIVO" />
-                        <f:selectItem itemLabel="Inactivo" itemValue="INACTIVO" />
-                    </p:selectOneMenu>
+    </style>
+</h:head>
 
-                </p:panelGrid>
+<h:body style="
+    background: url('#{resource['images/login.png']}') no-repeat center center fixed;
+    background-size: cover;">
 
-                <p:separator/>
+    <h:form>
+        <p:panel header="Registro de Conductores" styleClass="form-card">
 
-                <p:commandButton value="Guardar Conductor" 
-                                 action="#{conductorBean.guardar}" 
-                                 update="messages"
-                                 icon="pi pi-save"
-                                 styleClass="ui-button-secondary"/>
+            <!-- Botón arriba a la derecha -->
+            <f:facet name="actions">
+                <p:button value="Regresar" 
+                          icon="pi pi-arrow-left" 
+                          outcome="dashboard.xhtml"
+                          style="background: #16a085; border:none; font-weight:bold;"/>
+            </f:facet>
 
-            </p:panel>
-        </h:form>
-    </h:body>
+            <p:messages id="messages" showDetail="true" closable="true"/>
+
+            <p:panelGrid columns="2"
+                         columnClasses="label,value"
+                         styleClass="two-cols"
+                         layout="grid">
+
+                <h:outputLabel for="nombre" value="Nombre Completo:" styleClass="label"/>
+                <p:inputText id="nombre" value="#{conductorBean.nombre}" required="true" label="Nombre Completo"/>
+
+                <h:outputLabel for="dpi" value="DPI / Identificación:" styleClass="label"/>
+                <p:inputText id="dpi" value="#{conductorBean.dpi}" required="true" label="DPI / Identificación"/>
+
+                <h:outputLabel for="licencia" value="No. Licencia:" styleClass="label"/>
+                <p:inputText id="licencia" value="#{conductorBean.licencia}" required="true" label="No. Licencia"/>
+
+                <h:outputLabel for="telefono" value="Teléfono:" styleClass="label"/>
+                <p:inputMask id="telefono" value="#{conductorBean.telefono}" mask="9999-9999" label="Teléfono"/>
+
+                <h:outputLabel for="estado" value="Estado:" styleClass="label"/>
+                <p:selectOneMenu id="estado" value="#{conductorBean.estado}" label="Estado" styleClass="w-full">
+                    <f:selectItem itemLabel="Seleccione" itemValue="" />
+                    <f:selectItem itemLabel="Activo" itemValue="ACTIVO" />
+                    <f:selectItem itemLabel="Inactivo" itemValue="INACTIVO" />
+                </p:selectOneMenu>
+
+            </p:panelGrid>
+
+            <p:separator/>
+
+            <p:commandButton value="Guardar Conductor"
+                             action="#{conductorBean.guardar}"
+                             update="messages"
+                             icon="pi pi-save"
+                             styleClass="ui-button-secondary"/>
+        </p:panel>
+    </h:form>
+</h:body>
 </html>
