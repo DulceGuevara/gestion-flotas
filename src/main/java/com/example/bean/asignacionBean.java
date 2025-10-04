@@ -1,18 +1,26 @@
 package com.example.bean;
 
 import com.example.bean.dto.AsignacionDTO;
+import com.example.bean.dto.Coordenada;
 import com.example.model.AsignacionConductorVehiculo;
 import com.example.model.Conductor;
 import com.example.model.Usuario;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
+import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
@@ -21,7 +29,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 
 @ManagedBean(name = "asignacionBean")
-@ViewScoped
+@SessionScoped
 public class AsignacionBean {
 
     private String nombreConductor;
@@ -39,6 +47,15 @@ public class AsignacionBean {
     private List<AsignacionDTO> asignacion;
     private EntityManagerFactory emf;
     private int idAsignacion;
+    private List<Coordenada> coordenadas = new ArrayList<>();
+
+    public List<Coordenada> getCoordenadas() {
+        return coordenadas;
+    }
+
+    public void setCoordenadas(List<Coordenada> coordenadas) {
+        this.coordenadas = coordenadas;
+    }
 
     @PostConstruct
     public void init() {
@@ -74,8 +91,43 @@ public class AsignacionBean {
         }
     }
 
+    public void cargarCoordenadas() {
+        try {
+            URL url = new URL("https://api-logistica-tracking.onrender.com/coordenadas");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            StringBuilder content = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+            con.disconnect();
+
+            // parsear JSON a lista de objetos
+            coordenadas = gson.fromJson(content.toString(), new TypeToken<List<Coordenada>>() {
+            }.getType());
+
+            System.out.println("" + coordenadas);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            coordenadas = Collections.emptyList();
+        }
+    }
+
     private AsignacionDTO asignacion1; // debe existir como atributo en el bean
     Gson gson = new Gson();
+
+    public Gson getGson() {
+        return gson;
+    }
+
+    public void setGson(Gson gson) {
+        this.gson = gson;
+    }
 
     public void findDatosAsignacionById() {
         EntityManager em = emf.createEntityManager(); // o emf.createEntityManager();

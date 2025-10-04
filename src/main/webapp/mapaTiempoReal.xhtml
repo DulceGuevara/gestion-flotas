@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Asignaciones - Rutas</title>
+
+        <!-- Leaflet CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+        <!-- Leaflet JS -->
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+        <style>
+            body {
+                margin: 0; min-height: 100vh;
+                background: url("#{resource['images/login.png']}") no-repeat center center fixed;
+                background-size: cover;
+                color: #fff;
+                font-family: Arial, sans-serif;
+            }
+            .page-card {
+                width: min(1100px, 95vw);
+                margin: 80px auto 24px;
+                background: rgba(50,50,50,.65);
+                border-radius: 12px;
+                box-shadow: 0 4px 18px rgba(0,0,0,.45);
+                padding: 1rem 1.25rem 1.5rem;
+            }
+            .top-actions {
+                position: fixed; top: 12px; right: 16px; z-index: 1000;
+            }
+            .info-box {
+                margin-bottom: 20px;
+                background-color: rgba(255,255,255,.9);
+                color: #222;
+                padding: 15px;
+                border-radius: 10px;
+                border: 1px solid rgba(255,255,255,.25);
+            }
+            #map {
+                height: 500px;
+                width: 100%;
+                margin-top: 12px;
+                border-radius: 10px;
+                border: 2px solid rgba(255,255,255,.35);
+            }
+            h1 { margin:.25rem 0 1rem; text-align:center; }
+        </style>
+    </h:head>
+
+    <h:body>
+        <div class="top-actions">
+            <p:button value="Regresar" icon="pi pi-arrow-left" outcome="dashboard.xhtml"
+                      style="background:rgba(80,80,80,.9); border:none; color:#fff; font-weight:bold; border-radius:10px; padding:.55rem 1rem;" />
+        </div>
+
+ <h:panelGroup id="infoBox">
+                <div class="info-box">
+                    <div class="info-header">
+                        <h2 style="margin:0">Detalles de la Asignación</h2>
+                        <div class="info-actions">
+                            
+                        </div>
+                    </div>
+
+                    <h:panelGrid columns="2" cellpadding="5">
+                        <h:outputLabel value="Conductor:" />
+                        <h:outputText value="#{asignacionBean.asignacion1.nombre}" />
+
+                        <h:outputLabel value="DPI:" />
+                        <h:outputText value="#{asignacionBean.asignacion1.dpi}" />
+
+                        <h:outputLabel value="Vehículo (Placa):" />
+                        <h:outputText value="#{asignacionBean.asignacion1.placa}" />
+
+                        <h:outputLabel value="Marca:" />
+                        <h:outputText value="#{asignacionBean.asignacion1.marca}" />
+
+                        <h:outputLabel value="Ruta asignada:" />
+                        <h:outputText value="#{asignacionBean.asignacion1.nombreRuta}" />
+
+                        <h:outputLabel value="Fecha de asignación:" />
+                        <h:outputText value="#{asignacionBean.asignacion1.fechaAsignacion}" />
+
+                        <h:outputLabel value="GPS IMEI:" />
+                        <h:outputText value="#{asignacionBean.asignacion1.gpsImei}" />
+                    </h:panelGrid>
+                </div>
+            </h:panelGroup>
+
+
+        <div class="page-card">
+            <h:form id="formMapa">
+                <p:messages id="msgs" showDetail="true" closable="true" />
+                <h1>Asignaciones - Rutas</h1>
+
+                <!-- Se ejecuta cada 10 segundos -->
+                <p:poll interval="10" listener="#{asignacionBean.cargarCoordenadas}" update="mapScript" />
+
+                <!-- Contenedor del mapa -->
+                <div id="map"></div>
+
+                <!-- Script dinámico generado desde el bean -->
+                <h:panelGroup id="mapScript">
+                    <script type="text/javascript">
+                        //<![CDATA[
+                        (function(){
+                            var data = #{asignacionBean.gson.toJson(asignacionBean.coordenadas)};
+
+                            if (!window._map) {
+                                window._map = L.map('map').setView([14.6349, -90.5069], 6);
+                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                    attribution: '© OpenStreetMap contributors'
+                                }).addTo(window._map);
+                                window._polyline = L.polyline([], {color: 'blue'}).addTo(window._map);
+                                window._markers = [];
+                            }
+
+                            // limpiar puntos previos
+                            window._markers.forEach(m => window._map.removeLayer(m));
+                            window._markers = [];
+
+                            var latlngs = [];
+
+                            data.sort((a, b) => a.id - b.id);
+                            data.forEach((p, idx) => {
+                                var lat = parseFloat(p.latitud);
+                                var lon = parseFloat(p.longitud);
+                                if (!isNaN(lat) && !isNaN(lon)) {
+                                    latlngs.push([lat, lon]);
+
+                                    var iconUrl;
+                                    if (idx === 0) {
+                                        iconUrl = 'https://cdn-icons-png.flaticon.com/512/190/190411.png'; // inicio verde
+                                    } else if (idx === data.length - 1) {
+                                        iconUrl = 'https://cdn-icons-png.flaticon.com/512/190/190416.png'; // fin rojo
+                                    } else {
+                                        iconUrl = 'https://cdn-icons-png.flaticon.com/512/252/252025.png'; // intermedio azul
+                                    }
+
+                                    var marker = L.marker([lat, lon], {
+                                        icon: L.icon({
+                                            iconUrl: iconUrl,
+                                            iconSize: [25, 41],
+                                            iconAnchor: [12, 41]
+                                        })
+                                    }).addTo(window._map);
+
+                                    marker.bindPopup("📍 Punto ID: " + p.id + "<br/>Fecha: " + p.fecha);
+                                    window._markers.push(marker);
+                                }
+                            });
+
+                            window._polyline.setLatLngs(latlngs);
+
+                            if (latlngs.length > 0) {
+                                window._map.fitBounds(window._polyline.getBounds(), {padding:[30,30]});
+                            }
+                        })();
+                        //]]>
+                    </script>
+                </h:panelGroup>
+            </h:form>
+        </div>
+    </h:body>
+</html>

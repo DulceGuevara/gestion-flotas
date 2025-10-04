@@ -1,16 +1,16 @@
 <persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
              version="2.1">
     <persistence-unit name="loginPU" transaction-type="RESOURCE_LOCAL">
-        <class>com.example.model.Usuario</class>
+        <class>com.example.model.Usuario</class>    
         <class>com.example.model.Conductor</class>
         <class>com.example.model.AsignacionConductorVehiculo</class>
         <class>com.example.model.Rutas</class>
         <class>com.example.model.Vehiculo</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/logistica_rutas_db"/>
-            <property name="javax.persistence.jdbc.user" value="appLogisticaDS"/>
-            <property name="javax.persistence.jdbc.password" value="logistica123$"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://logistica-rutas-db1.cz00y2mig2p3.us-east-2.rds.amazonaws.com:3306/logistica_rutas_db"/>
+            <property name="javax.persistence.jdbc.user" value="admin"/>
+            <property name="javax.persistence.jdbc.password" value="Admin#2025_DB!"/>
             <property name="javax.persistence.schema-generation.database.action" value="validate"/>
             <property name="eclipselink.logging.level" value="FINE"/>
             <property name="hibernate.show_sql" value="true"/> <!-- Muestra las consultas SQL en la consola -->

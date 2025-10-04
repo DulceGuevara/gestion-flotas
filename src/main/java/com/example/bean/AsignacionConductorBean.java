@@ -1,16 +1,23 @@
 package com.example.bean;
 
 import com.example.bean.dto.AsignacionDTO;
+import com.example.bean.dto.Coordenada;
 import com.example.model.AsignacionConductorVehiculo;
 import com.example.model.Conductor;
 import com.example.model.Rutas;
 import com.example.model.Usuario;
 import com.example.model.Vehiculo;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -40,6 +47,8 @@ public class AsignacionConductorBean implements Serializable {
     private Integer conductorSeleccionadoId;
     private Integer vehiculoSeleccionadoId;
     private Integer rutaSeleccionadaId;
+
+    private List<Coordenada> coordenadas = new ArrayList<>();
 
     @PostConstruct
     public void init() {
@@ -105,6 +114,32 @@ public class AsignacionConductorBean implements Serializable {
             return em.createQuery("SELECT r FROM Rutas r", Rutas.class).getResultList();
         } finally {
             em.close();
+        }
+    }
+    Gson gson = new Gson();
+
+    public void cargarCoordenadas() {
+        try {
+            URL url = new URL("https://api-logistica-tracking.onrender.com/coordenadas");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            StringBuilder content = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+            con.disconnect();
+
+            // parsear JSON a lista de objetos
+            coordenadas = gson.fromJson(content.toString(), new TypeToken<List<Coordenada>>() {
+            }.getType());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            coordenadas = Collections.emptyList();
         }
     }
 
@@ -180,4 +215,7 @@ public class AsignacionConductorBean implements Serializable {
         this.rutaSeleccionadaId = rutaSeleccionadaId;
     }
 
+    public List<Coordenada> getCoordenadas() {
+        return coordenadas;
+    }
 }
